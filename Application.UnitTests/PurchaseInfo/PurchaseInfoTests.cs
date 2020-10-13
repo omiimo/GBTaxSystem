@@ -22,9 +22,9 @@ namespace Application.UnitTests.PurchaseInfo
         /// <param name="vatAmount">Expected VAT Amount</param>
         /// <param name="netAmount">Expected Net Amount</param>
         [Theory]
-        [InlineData(10, 459, 45.90, 504.90)]
-        [InlineData(13, 3425, 445.25, 3870.25)]
-        [InlineData(20, 267, 53.40, 320.40)]
+        [InlineData(10, 504.90, 45.90, 459)]
+        [InlineData(13, 3870.25, 445.25, 3425)]
+        [InlineData(20, 320.40, 53.40, 267)]
         public async void CalculateValidPurchaseInfo(decimal vatRate, decimal grossAmount, decimal vatAmount, decimal netAmount)
         {
             // Arrange
