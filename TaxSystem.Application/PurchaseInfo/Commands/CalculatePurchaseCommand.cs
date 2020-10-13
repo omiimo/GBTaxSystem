@@ -13,9 +13,9 @@ namespace TaxSystem.Application.PurchaseInfo.Commands
     public class CalculatePurchaseCommand : IRequest<PurchaseData>
     {
         public decimal VATRate { get; set; }
-        public decimal NetAmount { get; set; }
-        public decimal GrossAmount { get; set; }
-        public decimal VATAmount { get; set; }
+        public decimal? NetAmount { get; set; }
+        public decimal? GrossAmount { get; set; }
+        public decimal? VATAmount { get; set; }
 
         public class Handler : IRequestHandler<CalculatePurchaseCommand, PurchaseData>
         {
@@ -31,24 +31,24 @@ namespace TaxSystem.Application.PurchaseInfo.Commands
                     VATRate =  request.VATRate
                 };
 
-                var vatrate = purchaseData.VATRate / 100;
-                if (purchaseData.VATAmount != 0)
+                var vatrate = purchaseData.VATRate / 100M;
+                if (purchaseData.VATAmount != 0 && purchaseData.VATAmount != null)
                 {
-                    purchaseData.GrossAmount = Math.Round((purchaseData.VATAmount * (1 + vatrate)/vatrate), 2 );
-                    purchaseData.NetAmount = Math.Round((purchaseData.VATAmount / vatrate), 2);
+                    purchaseData.GrossAmount = Math.Round((purchaseData.VATAmount.Value * (1 + vatrate)/vatrate), 2 );
+                    purchaseData.NetAmount = Math.Round((purchaseData.VATAmount.Value / vatrate), 2);
                     return Task.FromResult(purchaseData);
                 }
 
-                if (purchaseData.GrossAmount != 0)
+                if (purchaseData.GrossAmount != 0 && purchaseData.GrossAmount != null)
                 {
-                    purchaseData.VATAmount = Math.Round(purchaseData.GrossAmount * (vatrate) / (1 + vatrate), 2);
-                    purchaseData.NetAmount = Math.Round(purchaseData.GrossAmount / (1 + vatrate), 2);
+                    purchaseData.VATAmount = Math.Round(purchaseData.GrossAmount.Value * (vatrate) / (1 + vatrate), 2);
+                    purchaseData.NetAmount = Math.Round(purchaseData.GrossAmount.Value / (1 + vatrate), 2);
                     return Task.FromResult(purchaseData);
                 }
-                if (purchaseData.NetAmount != 0)
+                if (purchaseData.NetAmount != 0 && purchaseData.NetAmount != null)
                 {
-                    purchaseData.GrossAmount = Math.Round((purchaseData.NetAmount * (1 + vatrate)), 2);
-                    purchaseData.VATAmount = Math.Round((purchaseData.NetAmount * vatrate), 2);
+                    purchaseData.GrossAmount = Math.Round((purchaseData.NetAmount.Value * (1 + vatrate)), 2);
+                    purchaseData.VATAmount = Math.Round((purchaseData.NetAmount.Value * vatrate), 2);
                     return Task.FromResult(purchaseData);
                 }
                 return Task.FromResult(purchaseData);
@@ -58,33 +58,40 @@ namespace TaxSystem.Application.PurchaseInfo.Commands
             {
                 IDictionary<string, string[]> errors = new Dictionary<string, string[]>();
 
+                //Valid VAT rate for Austria - 10, 13, 20
                 if (request.VATRate != 10 && request.VATRate != 13 && request.VATRate != 20)
                 {
-                    errors.Add(nameof(request.VATRate), new string[] {"Invalid VAT Rates. Valid VAT rates for Austria are 10, 13, 20"});
+                    errors.Add(nameof(request.VATRate), new string[] {"Mandatory Field. Valid VAT rates for Austria are 10, 13, 20"});
                 }
-
-                if(request.GrossAmount == 0 && request.NetAmount == 0 && request.VATAmount == 0)
+                
+                if(request.GrossAmount == null && request.NetAmount == null && request.VATAmount == null)
                 {
                     errors.Add(nameof(PurchaseData), 
-                        new string[] { "There should be atleast one Input" });
+                        new string[] { "There should be at least one Input" });
                 }
 
-                if(request.GrossAmount >0 && (request.NetAmount != 0 || request.VATAmount != 0))
+                if (request.GrossAmount == 0 || request.NetAmount == 0 || request.VATAmount == 0)
+                {
+                    errors.Add(nameof(PurchaseData),
+                        new string[] { "Input values should not be 0" });
+                }
+
+                if (request.GrossAmount > 0 && (request.NetAmount != null || request.VATAmount != null))
                 {
                     errors.Add(nameof(request.GrossAmount),
-                        new string[] { "There should only one input" });
+                        new string[] { "Only one input is allowed" });
                 }
 
-                if (request.NetAmount > 0 && (request.GrossAmount != 0 || request.VATAmount != 0))
+                if (request.NetAmount > 0 && (request.GrossAmount != null || request.VATAmount != null))
                 {
                     errors.Add(nameof(request.NetAmount),
-                        new string[] { "There should only one input" });
+                        new string[] { "Only one input is allowed" });
                 }
 
-                if (request.VATAmount > 0 && (request.NetAmount != 0 || request.GrossAmount != 0))
+                if (request.VATAmount > 0 && (request.NetAmount != null || request.GrossAmount != null))
                 {
                     errors.Add(nameof(request.VATAmount),
-                        new string[] { "There should only one input" });
+                       new string[] { "Only one input is allowed" });
                 }
 
                 if(errors.Count>0)

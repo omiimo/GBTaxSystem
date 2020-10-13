@@ -13,18 +13,15 @@ using Xunit;
 
 namespace Application.UnitTests.PurchaseInfo
 {
-    public class PurchaseInfoTests
+    public class PurchaseInfoTest
     {
         /// <summary>
-        /// 
+        /// Test will validate processed purchase data with supplied sample purchase data
         /// </summary>
-        /// <param name="vatRate">Valid VAT rates are 10,13,20</param>
-        /// <param name="grossAmount">Gross Amount</param>
-        /// <param name="vatAmount">Expected VAT Amount</param>
-        /// <param name="netAmount">Expected Net Amount</param>
+        /// <param name="purchaseData">A Valid pre-calculated input purchase data</param>
         [Theory]
         [ValidPurchaseInfoTestData]
-        public async void CalculateValidPurchaseInfo(PurchaseData purchaseData)
+        public async void Should_CalculateAndComparePurchaseData_With_PreCalculatedPurchaseData(PurchaseData purchaseData)
         {
             // Arrange
             var pcmd = new CalculatePurchaseCommand.Handler();           
@@ -53,7 +50,7 @@ namespace Application.UnitTests.PurchaseInfo
         }
 
         /// <summary>
-        /// Test should paas for VAT rate 10, 13, 20.
+        /// Test should check for valid and invalid VAT rate (10, 13, 20) and compare with expectedResult.
         /// </summary>
         /// <param name="vatRate">VAT Rate</param>
         /// <param name="expectedResult">Input True if VAT Rate is a valid value (10, 13, 20) else false</param>
@@ -63,7 +60,7 @@ namespace Application.UnitTests.PurchaseInfo
         [InlineData(20, true)]
         [InlineData(50, false)]
         [InlineData(16, false)]
-        public async void PurchaseDataVATRateValidation(decimal vatRate, bool expectedResult)
+        public async void Should_ValidateInputVatRate_With_ExpectedResult(decimal vatRate, bool expectedResult)
         {
 
             // Arrange
@@ -81,15 +78,20 @@ namespace Application.UnitTests.PurchaseInfo
 
         }
 
+        /// <summary>
+        /// Validation test for input PurchaseData.
+        /// </summary>
+        /// <param name="purchaseData">Sample data for validation</param>
+        /// <param name="expectedResult">Expected result for the purchaseData</param>
         [Theory]
         [PurchaseInfoInputTestData]
-        public async void PurchaseInputDataValidation(PurchaseData purchaseData, bool expected)
+        public async void Should_ValidateInputPurchaseDataModel_With_ExpectedResult(PurchaseData purchaseData, bool expectedResult)
         {
             //Arrange
             var pcmd = new CalculatePurchaseCommand.Handler();
 
             //Act & Assert
-            if (expected == false)
+            if (expectedResult == false)
             {
                 await Assert.ThrowsAsync<ValidationException>(async () => await pcmd.Handle(new CalculatePurchaseCommand { VATRate = purchaseData.VATRate, GrossAmount = purchaseData.GrossAmount, NetAmount = purchaseData.NetAmount, VATAmount = purchaseData.VATAmount }, CancellationToken.None));
             }
