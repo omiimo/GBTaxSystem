@@ -1,5 +1,4 @@
-﻿using FluentValidation.Results;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,28 +7,20 @@ namespace TaxSystem.Application.Exceptions
 {
     public class ValidationException : Exception
     {
+        IDictionary<string, string[]> _errors;
         public ValidationException()
             : base("One or more validation failures have occurred.")
         {
-            Errors = new Dictionary<string, string[]>();
+            _errors = new Dictionary<string, string[]>();
         }
 
-        public ValidationException(IEnumerable<ValidationFailure> failures)
+        public ValidationException(IDictionary<string, string[]> errors)
             : this()
         {
-            var failureGroups = failures
-                .GroupBy(e => e.PropertyName, e => e.ErrorMessage);
-
-            foreach (var failureGroup in failureGroups)
-            {
-                var propertyName = failureGroup.Key;
-                var propertyFailures = failureGroup.ToArray();
-
-                Errors.Add(propertyName, propertyFailures);
-            }
+            _errors = errors;
         }
 
-        public IDictionary<string, string[]> Errors { get; }
+        public IDictionary<string, string[]> Errors { get => _errors; }
     }
 
 }
