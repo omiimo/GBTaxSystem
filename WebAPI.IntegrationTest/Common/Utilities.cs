@@ -9,9 +9,14 @@ namespace WebAPI.IntegrationTest.Common
 {
     public class Utilities
     {
-        public static StringContent GetRequestContent(object obj)
+        public static StringContent GetRequestContentFromObject(object obj)
         {
             return new StringContent(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json");
+        }
+
+        public static StringContent GetRequestContentFromJSONString(string jsonString)
+        {
+            return new StringContent(jsonString, Encoding.UTF8, "application/json");
         }
 
         public static async Task<T> GetResponseContent<T>(HttpResponseMessage response)
