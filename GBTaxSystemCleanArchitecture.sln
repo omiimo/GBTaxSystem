@@ -21,7 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{FE39AF4F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.UnitTests", "Application.UnitTests\Application.UnitTests.csproj", "{2838B6BF-78B5-40C6-AD4E-C0A935E9B4CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI.IntegrationTest", "WebAPI.IntegrationTest\WebAPI.IntegrationTest.csproj", "{24841D2F-1601-4217-9E63-AA84B45DCA95}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI.IntegrationTest", "WebAPI.IntegrationTest\WebAPI.IntegrationTest.csproj", "{24841D2F-1601-4217-9E63-AA84B45DCA95}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
