@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Xml.Schema;
 using TaxSystem.Application.Exceptions;
 using TaxSystem.Application.Models;
+using TaxSystem.Application.Services;
 
 namespace TaxSystem.Application.PurchaseInfo.Commands
 {
@@ -19,83 +20,21 @@ namespace TaxSystem.Application.PurchaseInfo.Commands
 
         public class Handler : IRequestHandler<CalculatePurchaseCommand, PurchaseData>
         {
-            public Task<PurchaseData> Handle(CalculatePurchaseCommand request, CancellationToken cancellationToken)
+            IPurchaseService _purchaseService;
+            public Handler(IPurchaseService purchaseService)
             {
-                ValidateRequest(request);
+                _purchaseService = purchaseService;
+            }
 
-                PurchaseData purchaseData = new PurchaseData
+            public async Task<PurchaseData> Handle(CalculatePurchaseCommand request, CancellationToken cancellationToken)
+            {    
+                return await _purchaseService.CalculatePurchaseInfo(new PurchaseData 
                 {
                     GrossAmount = request.GrossAmount,
                     NetAmount = request.NetAmount,
                     VATAmount = request.VATAmount,
-                    VATRate =  request.VATRate
-                };
-
-                var vatrate = purchaseData.VATRate / 100M;
-                if (purchaseData.VATAmount != 0 && purchaseData.VATAmount != null)
-                {
-                    purchaseData.GrossAmount = Math.Round((purchaseData.VATAmount.Value * (1 + vatrate)/vatrate), 2 );
-                    purchaseData.NetAmount = Math.Round((purchaseData.VATAmount.Value / vatrate), 2);
-                    return Task.FromResult(purchaseData);
-                }
-
-                if (purchaseData.GrossAmount != 0 && purchaseData.GrossAmount != null)
-                {
-                    purchaseData.VATAmount = Math.Round(purchaseData.GrossAmount.Value * (vatrate) / (1 + vatrate), 2);
-                    purchaseData.NetAmount = Math.Round(purchaseData.GrossAmount.Value / (1 + vatrate), 2);
-                    return Task.FromResult(purchaseData);
-                }
-                if (purchaseData.NetAmount != 0 && purchaseData.NetAmount != null)
-                {
-                    purchaseData.GrossAmount = Math.Round((purchaseData.NetAmount.Value * (1 + vatrate)), 2);
-                    purchaseData.VATAmount = Math.Round((purchaseData.NetAmount.Value * vatrate), 2);
-                    return Task.FromResult(purchaseData);
-                }
-                return Task.FromResult(purchaseData);
-            }
-
-            private void ValidateRequest(CalculatePurchaseCommand request)
-            {
-                IDictionary<string, string[]> errors = new Dictionary<string, string[]>();
-
-                //Valid VAT rate for Austria - 10, 13, 20
-                if (request.VATRate != 10 && request.VATRate != 13 && request.VATRate != 20)
-                {
-                    errors.Add(nameof(request.VATRate), new string[] {"Mandatory Field. Valid VAT rates for Austria are 10, 13, 20"});
-                }
-                
-                if(request.GrossAmount == null && request.NetAmount == null && request.VATAmount == null)
-                {
-                    errors.Add(nameof(PurchaseData), 
-                        new string[] { "There should be at least one Input" });
-                }
-
-                if (request.GrossAmount == 0 || request.NetAmount == 0 || request.VATAmount == 0)
-                {
-                    errors.Add(nameof(PurchaseData),
-                        new string[] { "Input values should not be 0" });
-                }
-
-                if (request.GrossAmount > 0 && (request.NetAmount != null || request.VATAmount != null))
-                {
-                    errors.Add(nameof(request.GrossAmount),
-                        new string[] { "Only one input is allowed" });
-                }
-
-                if (request.NetAmount > 0 && (request.GrossAmount != null || request.VATAmount != null))
-                {
-                    errors.Add(nameof(request.NetAmount),
-                        new string[] { "Only one input is allowed" });
-                }
-
-                if (request.VATAmount > 0 && (request.NetAmount != null || request.GrossAmount != null))
-                {
-                    errors.Add(nameof(request.VATAmount),
-                       new string[] { "Only one input is allowed" });
-                }
-
-                if(errors.Count>0)
-                    throw new ValidationException(errors);
+                    VATRate = request.VATRate
+                });
             }
         }
     }

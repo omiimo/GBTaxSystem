@@ -9,6 +9,7 @@ using System.Threading;
 using TaxSystem.Application.Exceptions;
 using TaxSystem.Application.Models;
 using TaxSystem.Application.PurchaseInfo.Commands;
+using TaxSystem.Application.Services;
 using Xunit;
 
 namespace Application.UnitTests.PurchaseInfo
@@ -24,7 +25,7 @@ namespace Application.UnitTests.PurchaseInfo
         public async void Should_CalculateAndComparePurchaseData_With_PreCalculatedPurchaseData(PurchaseData purchaseData)
         {
             // Arrange
-            var pcmd = new CalculatePurchaseCommand.Handler();           
+            var pcmd = new CalculatePurchaseCommand.Handler(new PurchaseService());           
 
             // Act
             var resultGrossAmount = await pcmd.Handle(new CalculatePurchaseCommand { VATRate = purchaseData.VATRate, GrossAmount = purchaseData.GrossAmount }, CancellationToken.None);
@@ -64,7 +65,7 @@ namespace Application.UnitTests.PurchaseInfo
         {
 
             // Arrange
-            var pcmd = new CalculatePurchaseCommand.Handler();
+            var pcmd = new CalculatePurchaseCommand.Handler(new PurchaseService());
 
             //Act - assert
             if (expectedResult == false)
@@ -88,7 +89,7 @@ namespace Application.UnitTests.PurchaseInfo
         public async void Should_ValidateInputPurchaseDataModel_With_ExpectedResult(PurchaseData purchaseData, bool expectedResult)
         {
             //Arrange
-            var pcmd = new CalculatePurchaseCommand.Handler();
+            var pcmd = new CalculatePurchaseCommand.Handler(new PurchaseService());
 
             //Act & Assert
             if (expectedResult == false)
