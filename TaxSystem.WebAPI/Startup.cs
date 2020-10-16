@@ -23,7 +23,7 @@ namespace TaxSystem.WebAPI
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //Adds application services (TaxCalculator Service)
+            //Register application services in the DI container
             services.AddApplication();
 
             services.AddControllers(options=>

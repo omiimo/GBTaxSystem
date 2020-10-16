@@ -9,6 +9,11 @@ namespace TaxSystem.Application.Services
 {
     public class PurchaseService : IPurchaseService
     {
+        /// <summary>
+        /// Calculates net, gross and VAT amount
+        /// </summary>
+        /// <param name="purchaseData">Input Purchase data</param>
+        /// <returns>Calculated purchase data</returns>
         public Task<PurchaseData> CalculatePurchaseInfo(PurchaseData purchaseData)
         {
             ValidateRequest(purchaseData);
@@ -36,7 +41,10 @@ namespace TaxSystem.Application.Services
             return Task.FromResult(purchaseData);
         }
 
-
+        /// <summary>
+        /// Validates Input purchase DATA
+        /// </summary>
+        /// <param name="purchaseData">Purchase DATA</param>
         private void ValidateRequest(PurchaseData purchaseData)
         {
             IDictionary<string, string[]> errors = new Dictionary<string, string[]>();

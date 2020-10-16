@@ -4,6 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace TaxSystem.WebAPI.Controllers
 {
+    /// <summary>
+    /// Base controller
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class ApiBaseController : ControllerBase
